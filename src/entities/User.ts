@@ -20,6 +20,7 @@ export class User {
   @Property({ type: "text", unique: true })
   username!: string;
 
+  // No field property to prevent passwords from being queried
   @Property({ type: "text" })
   password!: string;
 }
