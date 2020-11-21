@@ -10,14 +10,18 @@ import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 
 const main = async () => {
-  const orm = await MikroORM.init(microConfig);
-  await orm.getMigrator().up();
+  const orm = await MikroORM.init(microConfig); // configurating mikro-orm
+  await orm.getMigrator().up(); // reruns the migrations
+
+  // const post = orm.em.create(Post, { title: "my first post" });
+  // await orm.em.persistAndFlush(post);
 
   // const posts = await orm.em.find(Post, {});
   // console.log(posts);
 
   const app = express();
 
+  // Create apollo server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver],
@@ -29,7 +33,7 @@ const main = async () => {
   apolloServer.applyMiddleware({ app });
 
   app.listen(4000, () => {
-    console.log("server started on localhost:4000");
+    console.log("server started on localhost:4000"); // localhost:4000/graphql
   });
 };
 
