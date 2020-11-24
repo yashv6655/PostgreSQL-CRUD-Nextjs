@@ -12,11 +12,13 @@ import InputField from "../components/inputField";
 // import { useMutation } from "urql";
 import { useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
+import { useRouter } from "next/router";
 
 interface registerProps {}
 
 const Register: React.FC<registerProps> = ({}) => {
   const [, register] = useRegisterMutation();
+  const router = useRouter();
   return (
     <Wrapper variant="small">
       <Formik
@@ -25,6 +27,9 @@ const Register: React.FC<registerProps> = ({}) => {
           const res = await register(values);
           if (res.data?.register.errors) {
             setErrors(toErrorMap(res.data.register.errors));
+          } else if (res.data.register.user) {
+            // register worked
+            router.push("/");
           }
         }}
       >
