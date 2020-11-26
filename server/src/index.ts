@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 // import { Post } from "./entities/Post";
 import microConfig from "./mikro-orm.config";
 import express from "express";
@@ -39,7 +39,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: "qid", // coockie name. Change Graphql "request.credentials" to "include"
+      name: COOKIE_NAME, // coockie name. Change Graphql "request.credentials" to "include"
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,
