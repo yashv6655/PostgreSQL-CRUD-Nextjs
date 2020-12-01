@@ -5,3 +5,5 @@
 - Redis
 - Typescript
 - Next.js
+- Mikro-ORM
+- Express Session
