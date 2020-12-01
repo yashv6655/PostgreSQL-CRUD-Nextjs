@@ -1,4 +1,4 @@
-# Simple-PostgreSQL-Login
+# PostgreSQL-Simple-Login
 
 #### Created a simple login system using:
 -  PostgreSQL
