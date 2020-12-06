@@ -1,32 +1,24 @@
-import { User } from "../entities/User";
-import { MyContext } from "src/types";
 import {
+  Resolver,
+  Mutation,
   Arg,
   Field,
-  InputType,
-  Mutation,
-  Resolver,
   Ctx,
   ObjectType,
   Query,
 } from "type-graphql";
+import { MyContext } from "../types";
+import { User } from "../entities/User";
 import argon2 from "argon2";
+import { EntityManager } from "@mikro-orm/postgresql";
 import { COOKIE_NAME } from "../constants";
-// import { EntityManager } from "@mikro-orm/postgresql";
-
-@InputType()
-class UsernamePasswordInput {
-  @Field()
-  username: string;
-  @Field()
-  password: string;
-}
+import { UsernamePasswordInput } from "./UsernamePasswordInput";
+import { validateRegister } from "../utils/validateRegister";
 
 @ObjectType()
 class FieldError {
   @Field()
   field: string;
-
   @Field()
   message: string;
 }
@@ -42,9 +34,15 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Mutation(() => Boolean)
+  async forgotPassword(@Arg("email") email: string, @Ctx() { em }: MyContext) {
+    // const user = await em.findOne(User, { email });
+    return true;
+  }
+
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { em, req }: MyContext) {
-    // not logged in
+  async me(@Ctx() { req, em }: MyContext) {
+    // you are not logged in
     if (!req.session.userId) {
       return null;
     }
@@ -53,114 +51,94 @@ export class UserResolver {
     return user;
   }
 
-  // *************************** Start of register ***************************
   @Mutation(() => UserResponse)
   async register(
-    @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
+    @Arg("options") options: UsernamePasswordInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    if (options.username.length <= 2) {
-      return {
-        errors: [
-          {
-            field: "username",
-            message: "Username legnth must be longer than 2",
-          },
-        ],
-      };
-    }
-
-    if (options.password.length <= 2) {
-      return {
-        errors: [
-          {
-            field: "password",
-            message: "Password length must be longer than 2",
-          },
-        ],
-      };
+    const errors = validateRegister(options);
+    if (errors) {
+      return { errors };
     }
 
     const hashedPassword = await argon2.hash(options.password);
-
-    const user = em.create(User, {
-      username: options.username,
-      password: hashedPassword,
-    });
-    // let user;
+    let user;
     try {
-      // const result = await (em as EntityManager)
-      //   .createQueryBuilder(User)
-      //   .getKnexQuery()
-      //   .insert({
-      //     username: options.username,
-      //     password: hashedPassword,
-      //     created_at: new Date(),
-      //     updated_at: new Date(),
-      //   })
-      //   .returning("*");
-      // await em.persistAndFlush(result[0]);
-      await em.persistAndFlush(user);
+      const result = await (em as EntityManager)
+        .createQueryBuilder(User)
+        .getKnexQuery()
+        .insert({
+          username: options.username,
+          email: options.email,
+          password: hashedPassword,
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
+        .returning("*");
+      user = result[0];
     } catch (err) {
-      if (err.code === "23505" || err.detail.includes("already exists")) {
-        // username exists error
+      //|| err.detail.includes("already exists")) {
+      // duplicate username error
+      if (err.code === "23505") {
         return {
           errors: [
             {
               field: "username",
-              message: "Username already exists",
+              message: "username already taken",
             },
           ],
         };
       }
-      console.log("message", err.message);
     }
 
-    // Sets a cookie for the user
-    req.session!.userId = user.id;
+    // store user id session
+    // this will set a cookie on the user
+    // keep them logged in
+    req.session.userId = user.id;
 
     return { user };
   }
-  // *************************** End of Register ***************************
 
-  // *************************** Start of Login ***************************
   @Mutation(() => UserResponse)
   async login(
-    @Arg("options", () => UsernamePasswordInput) options: UsernamePasswordInput,
+    @Arg("usernameOrEmail") usernameOrEmail: string,
+    @Arg("password") password: string,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(User, { username: options.username });
-
+    const user = await em.findOne(
+      User,
+      usernameOrEmail.includes("@")
+        ? { email: usernameOrEmail }
+        : { username: usernameOrEmail }
+    );
     if (!user) {
       return {
         errors: [
           {
-            field: "username",
-            message: "Username does not exist",
+            field: "usernameOrEmail",
+            message: "Username doesn't exist",
           },
         ],
       };
     }
-
-    const valid = await argon2.verify(user.password, options.password);
-
+    const valid = await argon2.verify(user.password, password);
     if (!valid) {
       return {
         errors: [
           {
             field: "password",
-            message: "Incorrect credentials",
+            message: "Incorrect Password",
           },
         ],
       };
     }
 
-    // Sets a cookie for the user
-    req.session!.userId = user.id;
+    req.session.userId = user.id;
 
-    return { user };
+    return {
+      user,
+    };
   }
-  // *************************** End of Login ***************************
 
   @Mutation(() => Boolean)
   logout(@Ctx() { req, res }: MyContext) {
@@ -172,6 +150,7 @@ export class UserResolver {
           resolve(false);
           return;
         }
+
         resolve(true);
       })
     );
