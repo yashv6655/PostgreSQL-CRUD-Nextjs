@@ -1,8 +1,5 @@
 import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
-import { COOKIE_NAME, __prod__ } from "./constants";
-// import { Post } from "./entities/Post";
-import microConfig from "./mikro-orm.config";
+import { __prod__, COOKIE_NAME } from "./constants";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -12,58 +9,57 @@ import { UserResolver } from "./resolvers/user";
 import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
-// import { MyContext } from "./types";
 import cors from "cors";
+import { createConnection } from "typeorm";
 import { Post } from "./entities/Post";
+import { User } from "./entities/User";
 
 const main = async () => {
-  const orm = await MikroORM.init(microConfig); // configurating mikro-orm
-  await orm.getMigrator().up(); // reruns the migrations
-
-  // const post = orm.em.create(Post, { title: "my first post" });
-  // await orm.em.persistAndFlush(post);
-
-  // const posts = await orm.em.find(Post, {});
-  // console.log(posts);
+  const conn = await createConnection({
+    type: "postgres",
+    database: "lireddit2",
+    username: "postgres",
+    password: "postgres",
+    logging: true,
+    synchronize: true,
+    entities: [Post, User],
+  });
 
   const app = express();
 
   const RedisStore = connectRedis(session);
   const redis = new Redis();
-
   app.use(
     cors({
       origin: "http://localhost:3000",
       credentials: true,
     })
   );
-
   app.use(
     session({
-      name: COOKIE_NAME, // coockie name. Change Graphql "request.credentials" to "include"
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redis,
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
-        sameSite: "lax",
-        secure: __prod__, // cookie works in only https
+        sameSite: "lax", // csrf
+        secure: __prod__, // cookie only works in https
       },
       saveUninitialized: false,
-      secret: "kvjcvjkldnvkjldmnvjkdklccs",
+      secret: "qowiueojwojfalksdjoqiwueo",
       resave: false,
     })
   );
 
-  // Create apollo server
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [HelloResolver, PostResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }) => ({ req, res, redis }),
   });
 
   apolloServer.applyMiddleware({
@@ -72,7 +68,7 @@ const main = async () => {
   });
 
   app.listen(4000, () => {
-    console.log("server started on localhost:4000"); // localhost:4000/graphql
+    console.log("server started on localhost:4000");
   });
 };
 
