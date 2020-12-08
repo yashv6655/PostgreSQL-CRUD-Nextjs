@@ -19,7 +19,7 @@ const main = async () => {
     type: "postgres",
     database: "lireddit2",
     username: "postgres",
-    password: "postgres",
+    password: "Postgresqlrootpassword",
     logging: true,
     synchronize: true,
     entities: [Post, User],

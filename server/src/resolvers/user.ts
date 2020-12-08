@@ -47,7 +47,7 @@ export class UserResolver {
         errors: [
           {
             field: "newPassword",
-            message: "length must be greater than 2",
+            message: "Password length must be greater than 2",
           },
         ],
       };
@@ -60,7 +60,7 @@ export class UserResolver {
         errors: [
           {
             field: "token",
-            message: "token expired",
+            message: "The token has expired",
           },
         ],
       };
@@ -74,7 +74,7 @@ export class UserResolver {
         errors: [
           {
             field: "token",
-            message: "user no longer exists",
+            message: "This user no longer exists",
           },
         ],
       };
@@ -160,14 +160,13 @@ export class UserResolver {
         .execute();
       user = result.raw[0];
     } catch (err) {
-      //|| err.detail.includes("already exists")) {
       // duplicate username error
       if (err.code === "23505") {
         return {
           errors: [
             {
               field: "username",
-              message: "username already taken",
+              message: "Username already exists.",
             },
           ],
         };
@@ -198,7 +197,7 @@ export class UserResolver {
         errors: [
           {
             field: "usernameOrEmail",
-            message: "that username doesn't exist",
+            message: "Username doesn't exist",
           },
         ],
       };
@@ -209,7 +208,7 @@ export class UserResolver {
         errors: [
           {
             field: "password",
-            message: "incorrect password",
+            message: "Incorrect password",
           },
         ],
       };
