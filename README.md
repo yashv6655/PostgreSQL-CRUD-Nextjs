@@ -5,5 +5,7 @@
 - Redis
 - Typescript
 - Next.js
-- Mikro-ORM
+- ~~Mikro-ORM~~ &#8594; TypeORM
 - Express Session
+- URQL
+- GraphQL
