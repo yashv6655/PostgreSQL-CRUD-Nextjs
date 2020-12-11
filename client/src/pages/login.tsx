@@ -43,20 +43,21 @@ const Login: React.FC<{}> = ({}) => {
                 type="password"
               />
             </Box>
-            <Button
-              type="submit"
-              isLoading={isSubmitting}
-              variantColor="teal"
-              mr={10}
-              mt={4}
-            >
-              Login
-            </Button>
-            <NextLink href="/forgot-password">
-              <Button mt={4}>
-                <Link ml="auto">Forgot Password?</Link>
+            <Flex>
+              <Button type="submit" isLoading={isSubmitting} mr={5} mt={4}>
+                Login
               </Button>
-            </NextLink>
+              <NextLink href="/register">
+                <Button mt={4} mr={5}>
+                  <Link ml="auto">Create an account</Link>
+                </Button>
+              </NextLink>
+              <NextLink href="/forgot-password">
+                <Button mt={4}>
+                  <Link ml="auto">Forgot Password?</Link>
+                </Button>
+              </NextLink>
+            </Flex>
           </Form>
         )}
       </Formik>

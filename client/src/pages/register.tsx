@@ -33,7 +33,7 @@ const Register: React.FC<registerProps> = ({}) => {
           <Form>
             <InputField
               name="username"
-              placeholder="username"
+              placeholder="Username"
               label="Username"
             />
             <Box mt={4}>
