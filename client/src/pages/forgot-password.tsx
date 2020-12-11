@@ -39,12 +39,7 @@ const ForgotPassword: React.FC<{}> = ({}) => {
                 label="Email"
                 type="email"
               />
-              <Button
-                mt={4}
-                type="submit"
-                isLoading={isSubmitting}
-                variantColor="teal"
-              >
+              <Button mt={4} type="submit" isLoading={isSubmitting}>
                 Send Email.
               </Button>
             </Form>
