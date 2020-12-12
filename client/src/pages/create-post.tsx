@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
-import InputField from "../components/InputField";
+import InputField from "../components/inputField";
 import Layout from "../components/Layout";
 // import Wrapper from "../components/Wrapper";
 import { useCreatePostMutation } from "../generated/graphql";

@@ -2,7 +2,7 @@ import React from "react";
 import { Formik, Form } from "formik";
 import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import Wrapper from "../components/Wrapper";
-import InputField from "../components/InputField";
+import InputField from "../components/inputField";
 // import { useMutation } from "urql";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
@@ -23,8 +23,13 @@ const Login: React.FC<{}> = ({}) => {
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
           } else if (response.data?.login.user) {
-            // Login worked
-            router.push("/");
+            if (typeof router.query.next === "string") {
+              // Reroute if coming from create-post page
+              router.push(router.query.next);
+            } else {
+              // Login worked
+              router.push("/");
+            }
           }
         }}
       >
