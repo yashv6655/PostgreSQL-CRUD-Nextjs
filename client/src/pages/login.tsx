@@ -10,12 +10,13 @@ import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
+import Layout from "../components/Layout";
 
 const Login: React.FC<{}> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
-    <Wrapper variant="small">
+    <Layout variant="small">
       <Formik
         initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
@@ -49,16 +50,17 @@ const Login: React.FC<{}> = ({}) => {
               />
             </Box>
             <Flex>
-              <Button type="submit" isLoading={isSubmitting} mr={5} mt={4}>
+              <Button
+                type="submit"
+                colorScheme="green"
+                isLoading={isSubmitting}
+                mr={5}
+                mt={4}
+              >
                 Login
               </Button>
-              <NextLink href="/register">
-                <Button mt={4} mr={5}>
-                  <Link ml="auto">Create an account</Link>
-                </Button>
-              </NextLink>
               <NextLink href="/forgot-password">
-                <Button mt={4}>
+                <Button mt={4} colorScheme="green">
                   <Link ml="auto">Forgot Password?</Link>
                 </Button>
               </NextLink>
@@ -66,7 +68,7 @@ const Login: React.FC<{}> = ({}) => {
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </Layout>
   );
 };
 export default withUrqlClient(createUrqlClient)(Login);
