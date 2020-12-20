@@ -1,5 +1,3 @@
-import { isAuth } from "../middleware/isAuth";
-import { MyContext } from "src/types";
 import {
   Resolver,
   Query,
@@ -12,8 +10,11 @@ import {
   Int,
   FieldResolver,
   Root,
+  ObjectType,
 } from "type-graphql";
 import { Post } from "../entities/Post";
+import { MyContext } from "../types";
+import { isAuth } from "../middleware/isAuth";
 import { getConnection } from "typeorm";
 
 @InputType()
@@ -24,24 +25,33 @@ class PostInput {
   text: string;
 }
 
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+  @Field()
+  hasMore: boolean;
+}
+
 @Resolver(Post)
 export class PostResolver {
   @FieldResolver(() => String)
-  textSnippet(@Root() root: Post) {
-    return root.text.slice(0, 50);
+  textSnippet(@Root() post: Post) {
+    return post.text.slice(0, 50);
   }
 
-  @Query(() => [Post])
+  @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
-  ): Promise<Post[]> {
+  ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit);
+    const reaLimitPlusOne = realLimit + 1;
     const queryBuilder = getConnection()
       .getRepository(Post)
       .createQueryBuilder("p")
       .orderBy('"createdAt"', "DESC")
-      .take(realLimit);
+      .take(reaLimitPlusOne);
 
     if (cursor) {
       queryBuilder.where('"createdAt" < :cursor', {
@@ -49,7 +59,12 @@ export class PostResolver {
       });
     }
 
-    return queryBuilder.getMany();
+    const posts = await queryBuilder.getMany();
+
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === reaLimitPlusOne,
+    };
   }
 
   @Query(() => Post, { nullable: true })
@@ -63,7 +78,10 @@ export class PostResolver {
     @Arg("input") input: PostInput,
     @Ctx() { req }: MyContext
   ): Promise<Post> {
-    return Post.create({ ...input, creatorId: req.session.userId }).save();
+    return Post.create({
+      ...input,
+      creatorId: req.session.userId,
+    }).save();
   }
 
   @Mutation(() => Post, { nullable: true })
