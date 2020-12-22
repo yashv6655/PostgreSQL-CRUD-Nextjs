@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useState } from "react";
+import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -44,15 +45,14 @@ const Index = () => {
       ) : (
         <Stack spacing={8} mb={5}>
           {data!.posts.posts.map((p) => (
-            <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Flex>
-                <Heading fontSize="2xl">{p.title}</Heading>
-                <Text fontSize="" mb={5} ml="auto" textDecor="bold">
-                  Creator: {p.creator.username}
-                </Text>
-              </Flex>
-              <Text mt={4}>{p.textSnippet}</Text>
-            </Box>
+            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+              <UpdootSection post={p} />
+              <Box>
+                <Heading fontSize="xl">{p.title}</Heading>
+                <Text>Creator: {p.creator.username}</Text>
+                <Text mt={4}>{p.textSnippet}</Text>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}
@@ -69,7 +69,7 @@ const Index = () => {
             m="auto"
             my={8}
           >
-            load more
+            More Posts
           </Button>
         </Flex>
       ) : null}
