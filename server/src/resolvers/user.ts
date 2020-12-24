@@ -6,8 +6,6 @@ import {
   Ctx,
   ObjectType,
   Query,
-  FieldResolver,
-  Root,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { User } from "../entities/User";
@@ -36,18 +34,8 @@ class UserResponse {
   user?: User;
 }
 
-@Resolver(User)
+@Resolver()
 export class UserResolver {
-  @FieldResolver(() => String)
-  email(@Root() user: User, @Ctx() { req }: MyContext) {
-    // Show email if current user is equal to the user who created the post
-    if (req.session.userId === user.id) {
-      return user.email;
-    }
-    // Return empty string if current user does not equal to the user who created the post
-    return "";
-  }
-
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg("token") token: string,
