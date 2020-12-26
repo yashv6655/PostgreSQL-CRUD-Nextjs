@@ -24,7 +24,6 @@ export class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
-  // No field property to prevent passwords from being queried
   @Column({ type: "text" })
   password!: string;
 
