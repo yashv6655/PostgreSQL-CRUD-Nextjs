@@ -1,7 +1,8 @@
-# PostgreSQL-Simple-Login
+# PostgreSQL-Simple-Reddit-Style-Web-App
 
 #### Created a simple login system using:
--  PostgreSQL
+
+- PostgreSQL
 - Redis
 - Typescript
 - Next.js
