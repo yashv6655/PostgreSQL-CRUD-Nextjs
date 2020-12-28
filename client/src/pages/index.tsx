@@ -1,18 +1,19 @@
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
-import { usePostsQuery } from "../generated/graphql";
-import Layout from "../components/Layout";
 import {
+  Box,
+  Button,
+  Flex,
+  Heading,
   Link,
   Stack,
-  Box,
-  Heading,
   Text,
-  Flex,
-  Button,
 } from "@chakra-ui/react";
+import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import { useState } from "react";
+import Layout from "../components/Layout";
+import { UpdootSection } from "../components/UpdootSection";
+import { usePostsQuery } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -31,10 +32,10 @@ const Index = () => {
   return (
     <Layout>
       <Flex align="center">
-        <Heading>SMM</Heading>
+        <Heading>LiReddit</Heading>
         <NextLink href="/create-post">
           <Button colorScheme="green" ml="auto">
-            <Link>Create Post</Link>
+            <Link ml="auto">Create A Post</Link>
           </Button>
         </NextLink>
       </Flex>
@@ -42,15 +43,18 @@ const Index = () => {
       {!data && fetching ? (
         <div>loading...</div>
       ) : (
-        <Stack spacing={8} mb={5}>
+        <Stack spacing={8}>
           {data!.posts.posts.map((p) => (
-            <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{p.title}</Heading>
-              <Text fontSize="sm" mt={2}>
-                Creator: {p.creator.username}
-              </Text>
-              <Text mt={4}>{p.textSnippet}</Text>
-            </Box>
+            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+              <UpdootSection post={p} />
+              <Box>
+                <Heading fontSize="xl">{p.title}</Heading>
+                <Text fontSize="sm" mt={2}>
+                  Creator: {p.creator.username}
+                </Text>
+                <Text mt={4}>{p.textSnippet}</Text>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}
@@ -67,7 +71,7 @@ const Index = () => {
             m="auto"
             my={8}
           >
-            load more
+            More Posts
           </Button>
         </Flex>
       ) : null}
