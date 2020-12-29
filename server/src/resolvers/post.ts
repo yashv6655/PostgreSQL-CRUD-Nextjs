@@ -11,7 +11,6 @@ import {
   FieldResolver,
   Root,
   ObjectType,
-  Info,
 } from "type-graphql";
 import { Post } from "../entities/Post";
 import { MyContext } from "../types";
@@ -52,22 +51,52 @@ export class PostResolver {
     const isUpdoot = value !== -1;
     const realValue = isUpdoot ? 1 : -1;
     const { userId } = req.session;
-    // await Updoot.insert({
-    //   userId,
-    //   postId,
-    //   value: realValue,
-    // });
-    await getConnection().query(
-      `
-    START TRANSACTION;
+
+    const updoot = await Updoot.findOne({ where: { postId, userId } });
+
+    // the user has voted on the post
+    // and they are changing their vote
+    if (updoot && updoot.value !== realValue) {
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `
+    update updoot
+    set value = $1
+    where "postId" = $2 and "userId" = $3
+        `,
+          [realValue, postId, userId]
+        );
+
+        await tm.query(
+          `
+          update post
+          set points = points + $1
+          where id = $2
+        `,
+          [2 * realValue, postId]
+        );
+      });
+    } else if (!updoot) {
+      // user has never voted before
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `
     insert into updoot ("userId", "postId", value)
-    values (${userId},${postId},${realValue});
+    values ($1, $2, $3)
+        `,
+          [userId, postId, realValue]
+        );
+
+        await tm.query(
+          `
     update post
-    set points = points + ${realValue}
-    where id = ${postId};
-    COMMIT;
-    `
-    );
+    set points = points + $1
+    where id = $2
+      `,
+          [realValue, postId]
+        );
+      });
+    }
     return true;
   }
 
@@ -76,10 +105,11 @@ export class PostResolver {
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
   ): Promise<PaginatedPosts> {
+    // 20 -> 21
     const realLimit = Math.min(50, limit);
-    const realLimitPlusOne = realLimit + 1;
+    const reaLimitPlusOne = realLimit + 1;
 
-    const replacements: any[] = [realLimitPlusOne];
+    const replacements: any[] = [reaLimitPlusOne];
 
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
@@ -104,25 +134,9 @@ export class PostResolver {
       replacements
     );
 
-    // const qb = getConnection()
-    //   .getRepository(Post)
-    //   .createQueryBuilder("p")
-    //   .innerJoinAndSelect("p.creator", "u", 'u.id = p."creatorId"')
-    //   .orderBy('p."createdAt"', "DESC")
-    //   .take(reaLimitPlusOne);
-
-    // if (cursor) {
-    //   qb.where('p."createdAt" < :cursor', {
-    //     cursor: new Date(parseInt(cursor)),
-    //   });
-    // }
-
-    // const posts = await qb.getMany();
-    // console.log("posts: ", posts);
-
     return {
       posts: posts.slice(0, realLimit),
-      hasMore: posts.length === realLimitPlusOne,
+      hasMore: posts.length === reaLimitPlusOne,
     };
   }
 
