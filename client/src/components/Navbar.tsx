@@ -54,6 +54,11 @@ const Navbar: React.FC<NavBarProps> = ({}) => {
 
   return (
     <Flex bg="green.500" p={4} position="sticky" top={0} zIndex={1}>
+      <NextLink href="/">
+        <Link>
+          <Text fontSize="2xl">Basically Reddit</Text>
+        </Link>
+      </NextLink>
       <Box ml={"auto"}>{body}</Box>
     </Flex>
   );

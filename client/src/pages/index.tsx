@@ -32,7 +32,7 @@ const Index = () => {
   return (
     <Layout>
       <Flex align="center">
-        <Heading>LiReddit</Heading>
+        <Heading>Basically Reddit</Heading>
         <NextLink href="/create-post">
           <Button colorScheme="green" ml="auto">
             <Link ml="auto">Create A Post</Link>
@@ -48,11 +48,15 @@ const Index = () => {
             <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
               <UpdootSection post={p} />
               <Box>
-                <Heading fontSize="xl">{p.title}</Heading>
+                <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{p.title}</Heading>
+                  </Link>
+                </NextLink>
                 <Text fontSize="sm" mt={2}>
                   Creator: {p.creator.username}
                 </Text>
-                <Text mt={4}>{p.textSnippet}</Text>
+                <Text mt={4}>{p.textSnippet}...</Text>
               </Box>
             </Flex>
           ))}
