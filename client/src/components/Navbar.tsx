@@ -37,14 +37,19 @@ const Navbar: React.FC<NavBarProps> = ({}) => {
         <Box mr={4}>
           <Text fontSize="xl">{data.me.username}</Text>
         </Box>
+        <NextLink href="/create-post">
+          <Button colorScheme="green" ml="auto" size="sm">
+            <Link>Create A Post</Link>
+          </Button>
+        </NextLink>
         <Button
           onClick={() => {
             logout();
           }}
           isLoading={logoutFetching}
-          colorScheme="green.400"
-          variant="link"
-          fontSize="small"
+          colorScheme="green"
+          // variant="link"
+          size="sm"
         >
           Logout
         </Button>
