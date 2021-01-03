@@ -1,23 +1,14 @@
 import React from "react";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { withUrqlClient } from "next-urql";
-import { useRouter } from "next/router";
-import { usePostQuery } from "../../generated/graphql";
 import Layout from "../../components/Layout";
-import { Box, Center, Flex, Heading, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Heading, Link, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useGetPostFromUrl } from "../../utils/useGetPostFromUrl";
+import { EditDeletePostButtons } from "../../components/EditDeletePostButtons";
 
 const Post = ({}) => {
-  const router = useRouter();
-  const intId =
-    typeof router.query.id === "string" ? parseInt(router.query.id) : -1;
-
-  const [{ data, fetching }] = usePostQuery({
-    pause: intId === -1,
-    variables: {
-      id: intId,
-    },
-  });
+  const [{ data, fetching }] = useGetPostFromUrl();
 
   if (fetching) {
     return (
@@ -50,12 +41,18 @@ const Post = ({}) => {
 
       <Center>
         <Text fontSize="2xl" mb={5}>
-          {data?.post?.text}
+          <Box mb={10}>{data?.post?.text}</Box>
+          <EditDeletePostButtons
+            id={data.post.id}
+            creatorId={data.post.creator.id}
+          />
         </Text>
       </Center>
       <Center>
         <NextLink href="/">
-          <Link>Back Home</Link>
+          <Link>
+            <Button colorScheme="green">Back Home</Button>
+          </Link>
         </NextLink>
       </Center>
     </Layout>
