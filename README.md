@@ -1,6 +1,6 @@
 # PostgreSQL-Simple-Reddit-Style-Web-App
 
-#### Created a simple login system using:
+#### Created a simple login system using
 
 - PostgreSQL
 - Redis
