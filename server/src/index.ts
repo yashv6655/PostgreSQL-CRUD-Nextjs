@@ -1,3 +1,4 @@
+require("dotenv").config();
 import "reflect-metadata";
 import { __prod__, COOKIE_NAME } from "./constants";
 import express from "express";
@@ -21,9 +22,9 @@ import { createUpdootLoader } from "./utils/createUpdootLoader";
 const main = async () => {
   const conn = await createConnection({
     type: "postgres",
-    database: "lireddit2",
-    username: "postgres",
-    password: "Postgresqlrootpassword",
+    database: process.env.DATABASE,
+    username: process.env.USER,
+    password: process.env.PASSWORD,
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
