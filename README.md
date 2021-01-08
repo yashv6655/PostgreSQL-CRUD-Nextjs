@@ -1,6 +1,6 @@
 # PostgreSQL-Simple-Reddit-Style-Web-App
 
-#### Created a simple login system using
+## Created a simple login system using
 
 - PostgreSQL
 - Redis
@@ -11,11 +11,34 @@
 - URQL
 - GraphQL
 
-#### Server
-- `cd server && npm install` to install server-side dependencies.
-- `npm run watch` to transpile the typescript code.
-- `npm run dev` to start up the development server after transpiling.
+## Description
+A simple Reddit style web application.
 
-#### Front-End
-- `cd client && npm install` to install all front-end dependencies. 
-- `npm run dev` to start up the web server on port `http://localhost:3000`.
+## Installation
+
+### Server-Side Installation
+```
+cd server
+npm install
+```
+
+### Front-End Installation
+```
+cd client
+npm install
+```
+
+## Development Server Startup
+
+### Server-Side Startup
+```
+npm run watch
+npm run dev
+```
+- Access the GraphQL API on `localhost:4000/graphql` after running `npm run dev`
+
+### Front-End Startup
+```
+npm run dev
+```
+- Web server is on `localhost:3000`.
