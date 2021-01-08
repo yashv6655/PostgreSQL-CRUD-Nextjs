@@ -28,16 +28,16 @@ cd client
 npm install
 ```
 
-## Development Server Startup
+## Start Development Environment
 
-### Server-Side Startup
+### Server-Side
 ```
 npm run watch
 npm run dev
 ```
 - Access the GraphQL API on `localhost:4000/graphql` after running `npm run dev`
 
-### Front-End Startup
+### Front-End
 ```
 npm run dev
 ```
